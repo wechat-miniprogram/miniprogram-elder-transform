@@ -1,0 +1,22 @@
+{
+  "name": "@tencent/elder-wxss-transform",
+  "version": "0.0.1",
+  "description": "wxss transformer for elder",
+  "main": "index.js",
+  "bin": {
+    "elder-wxss-transform": "bin.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@git.woa.com:chyizheng/elder-wxss-transform.git"
+  },
+  "author": "chyizheng",
+  "license": "ISC",
+  "dependencies": {
+    "postcss": "^8.3.5",
+    "postcss-value-parser": "^4.1.0"
+  }
+}
