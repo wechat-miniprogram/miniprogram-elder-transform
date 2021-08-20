@@ -1,5 +1,4 @@
 import postcss from "postcss";
-import valueParser from "postcss-value-parser";
 import selectorParser from "postcss-selector-parser";
 
 /**
@@ -23,21 +22,9 @@ const transformClassSizePlugin = ({classNames = []} = {}) => {
 
         if (!selectorMatch) return
 
+        const factor = 0.5
         rule.walkDecls(/^(width|height)$/, decl => {
-          const unit = valueParser.unit(decl.value);
-          if (!unit) return
-
-          const factor = 0.5
-
-          switch (unit.unit) {
-            case 'px':
-              decl.value = `calc(${+unit.number * factor / 16}rem + ${+unit.number * (1 - factor)}px)`;
-              break
-            case 'rpx':
-              decl.value = `calc(${+unit.number * factor / 32}rem + ${+unit.number * (1 - factor)}rpx)`
-            default:
-              return
-          }
+          decl.value = `calc(${decl.value} + ${factor} * (1rem - 16px))`;
         })
       });
     },
