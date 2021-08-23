@@ -8,7 +8,7 @@
 git clone git@git.woa.com:chyizheng/elder-wxss-transform.git
 cd elder-wxss-transform
 # install
-npm i
+npm i && npm run build
 # link
 npm link
 # execute
