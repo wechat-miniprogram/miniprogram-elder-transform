@@ -1,4 +1,5 @@
 import postcss from "postcss";
+import valueParser from "postcss-value-parser";
 
 /**
  * 转换 wxss 中的 font-size 插件
@@ -24,6 +25,10 @@ const transformFontSizePlugin = (options = {}) => {
             )
           )
             return;
+
+          // line-height 必须要带单位才进行转换
+          const unit = valueParser.unit(decl.value);
+          if (!unit) return;
 
           decl.value = `calc(${decl.value} + ${factor} * (1rem - 16px))`;
         });
