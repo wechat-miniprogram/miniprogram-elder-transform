@@ -13,6 +13,10 @@ const transformFontSizePlugin = (options = {}) => {
         let fontSizeValue;
         const factor = 0.5;
         rule.walkDecls("font-size", (decl) => {
+          // font-size 必须要带单位才进行转换
+          const unit = valueParser.unit(decl.value);
+          if (!unit) return;
+
           fontSizeValue = decl.value;
           decl.value = `calc(${decl.value} + ${factor} * (1rem - 16px))`;
         });

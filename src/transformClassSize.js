@@ -1,5 +1,6 @@
 import postcss from "postcss";
 import selectorParser from "postcss-selector-parser";
+import valueParser from "postcss-value-parser";
 
 /**
  * 转换 wxss 中的特定 class 宽高插件
@@ -22,8 +23,12 @@ const transformClassSizePlugin = ({classNames = []} = {}) => {
 
         if (!selectorMatch) return
 
+
         const factor = 0.5
         rule.walkDecls(/^(width|height)$/, decl => {
+          // 必须要带单位才进行转换
+          const unit = valueParser.unit(decl.value);
+          if (!unit) return;
           decl.value = `calc(${decl.value} + ${factor} * (1rem - 16px))`;
         })
       });
