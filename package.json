@@ -1,6 +1,6 @@
 {
   "name": "miniprogram-elder-transform",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "miniprogram transformer for elder",
   "main": "index.js",
   "bin": {
@@ -11,7 +11,8 @@
   },
   "scripts": {
     "build": "babel src --extensions '.js,.ts' --out-dir dist --ignore **/__tests__ --verbose",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
