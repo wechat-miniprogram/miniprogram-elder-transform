@@ -4,11 +4,11 @@ import transformPageMeta from "./transformPageMeta";
 import transformClassSize from "./transformClassSize";
 import extractImageClass from "./extractImageClass";
 import fs from "fs";
-import path from 'path';
-import yargs from 'yargs';
+import path from "path";
+import yargs from "yargs";
 
 async function transformWxss(cwd) {
-  const entries = await glob("**/*.wxss", {cwd, absolute: true});
+  const entries = await glob("**/*.wxss", { cwd, absolute: true });
   for (const entry of entries) {
     const source = await fs.promises.readFile(entry, "utf8");
     const output = await transformFontSize(source, entry);
@@ -17,12 +17,20 @@ async function transformWxss(cwd) {
 }
 
 async function transformPagesWxml(cwd) {
-  const appJsonPath = path.join(cwd, 'app.json')
+  const appJsonPath = path.join(cwd, "app.json");
   if (!fs.existsSync(appJsonPath)) return;
   const appJson = JSON.parse(await fs.promises.readFile(appJsonPath, "utf8"));
-  const pages = appJson.pages;
+  const subpackages = appJson.subpackages || [];
+  const subPages = subpackages.reduce((arr, item) => {
+    const res = (item.pages || []).map((i) => item.root + i);
+    return arr.concat(res);
+  }, []);
+  const pages = [...appJson.pages, ...subPages];
   for (const page of pages) {
-    const entry = path.join(cwd, (page[0] === "/" ? "." + page : page) + ".wxml");
+    const entry = path.join(
+      cwd,
+      (page[0] === "/" ? "." + page : page) + ".wxml"
+    );
     const source = await fs.promises.readFile(entry, "utf8");
     const output = await transformPageMeta(source, entry);
     await fs.promises.writeFile(entry, output, "utf8");
@@ -30,7 +38,7 @@ async function transformPagesWxml(cwd) {
 }
 
 async function transformImageSize(cwd) {
-  const wxmlEntries = await glob("**/*.wxml", {cwd, absolute: true});
+  const wxmlEntries = await glob("**/*.wxml", { cwd, absolute: true });
   const allImageClasses = [];
   for (const wxmlEntry of wxmlEntries) {
     const wxmlSource = await fs.promises.readFile(wxmlEntry, "utf8");
@@ -39,7 +47,10 @@ async function transformImageSize(cwd) {
     allImageClasses.push(...imageClasses);
   }
 
-  const wxssEntries = await glob("**/*.(wxss|css|less|sass|scss)", {cwd, absolute: true});
+  const wxssEntries = await glob("**/*.(wxss|css|less|sass|scss)", {
+    cwd,
+    absolute: true,
+  });
   for (const wxssEntry of wxssEntries) {
     const wxssSource = await fs.promises.readFile(wxssEntry, "utf8");
     const output = await transformClassSize(
@@ -51,15 +62,17 @@ async function transformImageSize(cwd) {
   }
 }
 
-const argv = yargs(process.argv.slice(2))
-  .usage("$0 <baseDir>", "transform mini program source code", (yargs) => {
+const argv = yargs(process.argv.slice(2)).usage(
+  "$0 <baseDir>",
+  "transform mini program source code",
+  (yargs) => {
     yargs.positional("baseDir", {
-      describe: 'directory to transform',
+      describe: "directory to transform",
       type: "string",
-      coerce: baseDir => path.join(process.cwd(), baseDir || ''),
+      coerce: (baseDir) => path.join(process.cwd(), baseDir || ""),
     });
-  })
-  .argv;
+  }
+).argv;
 
 async function main() {
   try {
